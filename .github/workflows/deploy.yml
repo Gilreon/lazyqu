@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '18.17.0'
           cache: 'npm'
 
       - name: Install Dependencies
@@ -27,6 +27,8 @@ jobs:
           npm list
 
       - name: Build
+        env:
+          NODE_ENV: production
         run: |
           npm run build
           ls -la dist/

@@ -24,8 +24,8 @@ export default defineConfig(({ mode }) => ({
     outDir: 'dist',
     sourcemap: true,
     rollupOptions: {
-      output: {
-        manualChunks: undefined,
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
       },
     },
   },
