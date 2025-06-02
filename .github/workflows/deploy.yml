@@ -19,15 +19,21 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
+          cache: 'npm'
 
       - name: Install Dependencies
-        run: npm install
+        run: |
+          npm ci
+          npm list
 
       - name: Build
-        run: npm run build
+        run: |
+          npm run build
+          ls -la dist/
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: dist
-          branch: gh-pages 
+          branch: gh-pages
+          clean: true 
