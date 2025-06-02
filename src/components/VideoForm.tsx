@@ -115,10 +115,13 @@ const VideoForm: React.FC<VideoFormProps> = ({
   const getWeekOptions = () => {
     const options = [];
     const today = new Date();
+    const startOfCurrentWeek = new Date(today);
+    startOfCurrentWeek.setDate(today.getDate() - today.getDay());
     
-    for (let i = -2; i <= 8; i++) {
-      const date = new Date(today);
-      date.setDate(date.getDate() + (i * 7) - date.getDay());
+    // Only show current week and future weeks (up to 8 weeks ahead)
+    for (let i = 0; i <= 8; i++) {
+      const date = new Date(startOfCurrentWeek);
+      date.setDate(startOfCurrentWeek.getDate() + (i * 7));
       const weekStart = date.toISOString().split('T')[0];
       const endDate = new Date(date);
       endDate.setDate(endDate.getDate() + 6);
@@ -247,34 +250,6 @@ const VideoForm: React.FC<VideoFormProps> = ({
             <p className="text-sm text-red-600">{errors.tags}</p>
           )}
         </div>
-      </div>
-
-      {/* Week Selector */}
-      <div>
-        <label htmlFor="week" className="block text-sm font-medium text-gray-700 mb-2">
-          <Calendar className="h-4 w-4 inline mr-1" />
-          Upload Week *
-        </label>
-        <select
-          id="week"
-          value={selectedWeek}
-          onChange={(e) => onSelectedWeekChange(e.target.value)}
-          className={`w-full px-4 py-3 border rounded-xl transition-colors ${
-            errors.weekStart 
-              ? 'border-red-300 focus:border-red-500 focus:ring-red-200' 
-              : 'border-gray-200 focus:border-purple-500 focus:ring-purple-200'
-          } focus:outline-none focus:ring-2`}
-        >
-          <option value="">Select a week...</option>
-          {getWeekOptions().map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        {errors.weekStart && (
-          <p className="mt-1 text-sm text-red-600">{errors.weekStart}</p>
-        )}
       </div>
 
       {/* Action Buttons */}

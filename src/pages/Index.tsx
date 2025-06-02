@@ -35,11 +35,13 @@ const Index = () => {
     setVideos([...videos, newVideo]);
   };
 
-  const updateVideo = (updatedVideo: VideoType) => {
-    setVideos(videos.map(video => 
-      video.id === updatedVideo.id ? updatedVideo : video
-    ));
-    setEditingVideo(null);
+  const updateVideo = (updatedVideo: VideoType | Omit<VideoType, 'id'>) => {
+    if ('id' in updatedVideo) {
+      setVideos(videos.map(video => 
+        video.id === updatedVideo.id ? updatedVideo : video
+      ));
+      setEditingVideo(null);
+    }
   };
 
   const deleteVideo = (id: string) => {
@@ -69,9 +71,46 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Week Selector */}
+          <div className="lg:col-span-3">
+            <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <Calendar className="h-5 w-5 text-purple-600" />
+                <h2 className="text-xl font-semibold text-gray-800">Select Upload Week</h2>
+              </div>
+              <select
+                value={selectedWeek}
+                onChange={(e) => setSelectedWeek(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-colors"
+              >
+                <option value="">Select a week...</option>
+                {Array.from({ length: 9 }, (_, i) => {
+                  const date = new Date();
+                  date.setDate(date.getDate() - date.getDay() + (i * 7));
+                  const weekStart = date.toISOString().split('T')[0];
+                  const endDate = new Date(date);
+                  endDate.setDate(endDate.getDate() + 6);
+                  
+                  return (
+                    <option key={weekStart} value={weekStart}>
+                      {date.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric' 
+                      })} - {endDate.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+          </div>
+
           {/* Video Form */}
-          <div className="space-y-6">
+          <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6">
               <div className="flex items-center gap-3 mb-6">
                 <Plus className="h-5 w-5 text-purple-600" />
@@ -91,25 +130,12 @@ const Index = () => {
           </div>
 
           {/* Video List */}
-          <div className="space-y-6">
+          <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6">
               <div className="flex items-center gap-3 mb-6">
                 <Calendar className="h-5 w-5 text-purple-600" />
                 <h2 className="text-xl font-semibold text-gray-800">
-                  {selectedWeek ? (
-                    <>
-                      Week of {new Date(selectedWeek).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric'
-                      })} - {new Date(new Date(selectedWeek).setDate(new Date(selectedWeek).getDate() + 6)).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric'
-                      })}
-                    </>
-                  ) : (
-                    "Select a Week"
-                  )}
+                  Videos
                 </h2>
                 <span className="text-sm text-gray-500 bg-purple-50 px-3 py-1 rounded-full">
                   {filteredVideos.length} planned
