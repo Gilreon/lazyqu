@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  base: '/video-week-flow/',
+  base: '/',
   build: {
     outDir: 'dist',
     sourcemap: true,

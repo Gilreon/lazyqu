@@ -29,6 +29,7 @@ jobs:
       - name: Build
         env:
           NODE_ENV: production
+          VITE_BASE_URL: 'https://www.lazyqu.com'
         run: |
           npm run build
           ls -la dist/
@@ -38,4 +39,5 @@ jobs:
         with:
           folder: dist
           branch: gh-pages
-          clean: true 
+          clean: true
+          commit-message: "Deploy to GitHub Pages" 
