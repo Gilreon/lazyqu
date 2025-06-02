@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Calendar, Save, X } from 'lucide-react';
 import { Video } from '../types/video';
@@ -20,7 +19,8 @@ const VideoForm: React.FC<VideoFormProps> = ({
 }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [tags, setTags] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
+  const [currentTag, setCurrentTag] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -28,6 +28,7 @@ const VideoForm: React.FC<VideoFormProps> = ({
       setTitle(editingVideo.title);
       setDescription(editingVideo.description);
       setTags(editingVideo.tags);
+      setCurrentTag('');
       onSelectedWeekChange(editingVideo.weekStart);
     } else {
       resetForm();
@@ -37,8 +38,23 @@ const VideoForm: React.FC<VideoFormProps> = ({
   const resetForm = () => {
     setTitle('');
     setDescription('');
-    setTags('');
+    setTags([]);
+    setCurrentTag('');
     setErrors({});
+  };
+
+  const handleTagKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (currentTag.trim() && !tags.includes(currentTag.trim())) {
+        setTags([...tags, currentTag.trim()]);
+        setCurrentTag('');
+      }
+    }
+  };
+
+  const removeTag = (indexToRemove: number) => {
+    setTags(tags.filter((_, index) => index !== indexToRemove));
   };
 
   const validateForm = () => {
@@ -56,8 +72,9 @@ const VideoForm: React.FC<VideoFormProps> = ({
       newErrors.description = 'Description must be at least 10 characters long';
     }
 
-    if (tags.length > 500) {
-      newErrors.tags = 'Tags must not exceed 500 characters';
+    const totalTagsLength = tags.join('').length + currentTag.length;
+    if (totalTagsLength > 500) {
+      newErrors.tags = 'Total tags content must not exceed 500 characters';
     }
 
     if (!selectedWeek) {
@@ -78,7 +95,7 @@ const VideoForm: React.FC<VideoFormProps> = ({
     const videoData = {
       title: title.trim(),
       description: description.trim(),
-      tags: tags.trim(),
+      tags: tags,
       weekStart: selectedWeek,
       createdAt: new Date().toISOString(),
     };
@@ -116,6 +133,8 @@ const VideoForm: React.FC<VideoFormProps> = ({
     
     return options;
   };
+
+  const totalTagsLength = tags.join('').length + currentTag.length;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -168,22 +187,45 @@ const VideoForm: React.FC<VideoFormProps> = ({
         <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-2">
           Video Tags
         </label>
-        <textarea
+        
+        {/* Display existing tags */}
+        {tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-3">
+            {tags.map((tag, index) => (
+              <span
+                key={index}
+                className="inline-flex items-center gap-1 bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm"
+              >
+                {tag}
+                <button
+                  type="button"
+                  onClick={() => removeTag(index)}
+                  className="ml-1 text-purple-600 hover:text-purple-800"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+
+        <input
+          type="text"
           id="tags"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          rows={3}
-          className={`w-full px-4 py-3 border rounded-xl transition-colors resize-none ${
+          value={currentTag}
+          onChange={(e) => setCurrentTag(e.target.value)}
+          onKeyPress={handleTagKeyPress}
+          className={`w-full px-4 py-3 border rounded-xl transition-colors ${
             errors.tags 
               ? 'border-red-300 focus:border-red-500 focus:ring-red-200' 
               : 'border-gray-200 focus:border-purple-500 focus:ring-purple-200'
           } focus:outline-none focus:ring-2`}
-          placeholder="Enter tags separated by commas..."
-          maxLength={500}
+          placeholder="Type a tag and press Enter to add..."
         />
+        
         <div className="mt-1 flex justify-between items-center">
-          <span className={`text-sm ${tags.length > 450 ? 'text-red-600' : 'text-gray-500'}`}>
-            {tags.length}/500 characters
+          <span className={`text-sm ${totalTagsLength > 450 ? 'text-red-600' : 'text-gray-500'}`}>
+            {totalTagsLength}/500 characters
           </span>
           {errors.tags && (
             <p className="text-sm text-red-600">{errors.tags}</p>

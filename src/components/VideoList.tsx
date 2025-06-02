@@ -70,12 +70,22 @@ const VideoList: React.FC<VideoListProps> = ({ videos, onEdit, onDelete }) => {
             {video.description}
           </p>
 
-          {video.tags && (
-            <div className="flex items-center gap-2 mb-3">
-              <Tag className="h-4 w-4 text-gray-400" />
-              <span className="text-sm text-gray-600 bg-white px-3 py-1 rounded-full border">
-                {video.tags.length > 50 ? `${video.tags.substring(0, 50)}...` : video.tags}
-              </span>
+          {video.tags && video.tags.length > 0 && (
+            <div className="mb-3">
+              <div className="flex items-center gap-2 mb-2">
+                <Tag className="h-4 w-4 text-gray-400" />
+                <span className="text-sm text-gray-500">Tags:</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {video.tags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="text-xs text-purple-700 bg-purple-100 px-2 py-1 rounded-full border"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
 
