@@ -64,12 +64,16 @@ const VideoForm: React.FC<VideoFormProps> = ({
       newErrors.title = 'Video title is required';
     } else if (title.length < 3) {
       newErrors.title = 'Title must be at least 3 characters long';
+    } else if (title.length > 100) {
+      newErrors.title = 'Title must not exceed 100 characters';
     }
 
     if (!description.trim()) {
       newErrors.description = 'Video description is required';
     } else if (description.length < 10) {
       newErrors.description = 'Description must be at least 10 characters long';
+    } else if (description.length > 5000) {
+      newErrors.description = 'Description must not exceed 5000 characters';
     }
 
     const totalTagsLength = tags.join('').length + currentTag.length;
@@ -148,6 +152,7 @@ const VideoForm: React.FC<VideoFormProps> = ({
           id="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          maxLength={100}
           className={`w-full px-4 py-3 border rounded-xl transition-colors ${
             errors.title 
               ? 'border-red-300 focus:border-red-500 focus:ring-red-200' 
@@ -155,9 +160,14 @@ const VideoForm: React.FC<VideoFormProps> = ({
           } focus:outline-none focus:ring-2`}
           placeholder="Enter your video title..."
         />
-        {errors.title && (
-          <p className="mt-1 text-sm text-red-600">{errors.title}</p>
-        )}
+        <div className="mt-1 flex justify-between items-center">
+          <span className={`text-sm ${title.length > 90 ? 'text-red-600' : 'text-gray-500'}`}>
+            {title.length}/100 characters
+          </span>
+          {errors.title && (
+            <p className="text-sm text-red-600">{errors.title}</p>
+          )}
+        </div>
       </div>
 
       {/* Video Description */}
@@ -169,6 +179,7 @@ const VideoForm: React.FC<VideoFormProps> = ({
           id="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          maxLength={5000}
           rows={4}
           className={`w-full px-4 py-3 border rounded-xl transition-colors resize-none ${
             errors.description 
@@ -177,9 +188,14 @@ const VideoForm: React.FC<VideoFormProps> = ({
           } focus:outline-none focus:ring-2`}
           placeholder="Describe your video content..."
         />
-        {errors.description && (
-          <p className="mt-1 text-sm text-red-600">{errors.description}</p>
-        )}
+        <div className="mt-1 flex justify-between items-center">
+          <span className={`text-sm ${description.length > 4500 ? 'text-red-600' : 'text-gray-500'}`}>
+            {description.length}/5000 characters
+          </span>
+          {errors.description && (
+            <p className="text-sm text-red-600">{errors.description}</p>
+          )}
+        </div>
       </div>
 
       {/* Video Tags */}

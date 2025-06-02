@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Calendar, Video, Edit3, Trash2, Plus } from 'lucide-react';
 import VideoForm from '../components/VideoForm';
@@ -60,7 +59,7 @@ const Index = () => {
             </div>
             <div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Creator Studio
+                LazyQu
               </h1>
               <p className="text-gray-600 text-sm">Plan your weekly video uploads</p>
             </div>
@@ -97,7 +96,20 @@ const Index = () => {
               <div className="flex items-center gap-3 mb-6">
                 <Calendar className="h-5 w-5 text-purple-600" />
                 <h2 className="text-xl font-semibold text-gray-800">
-                  This Week's Videos
+                  {selectedWeek ? (
+                    <>
+                      Week of {new Date(selectedWeek).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric'
+                      })} - {new Date(new Date(selectedWeek).setDate(new Date(selectedWeek).getDate() + 6)).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                    </>
+                  ) : (
+                    "Select a Week"
+                  )}
                 </h2>
                 <span className="text-sm text-gray-500 bg-purple-50 px-3 py-1 rounded-full">
                   {filteredVideos.length} planned
@@ -108,13 +120,14 @@ const Index = () => {
                 videos={filteredVideos}
                 onEdit={setEditingVideo}
                 onDelete={deleteVideo}
+                selectedWeek={selectedWeek}
               />
             </div>
           </div>
         </div>
 
         {/* Stats Section */}
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl p-6 text-white">
             <h3 className="text-lg font-semibold mb-2">Total Videos</h3>
             <p className="text-3xl font-bold">{videos.length}</p>
@@ -122,10 +135,6 @@ const Index = () => {
           <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 text-white">
             <h3 className="text-lg font-semibold mb-2">This Week</h3>
             <p className="text-3xl font-bold">{filteredVideos.length}</p>
-          </div>
-          <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl p-6 text-white">
-            <h3 className="text-lg font-semibold mb-2">Planning Streak</h3>
-            <p className="text-3xl font-bold">7 days</p>
           </div>
         </div>
       </main>

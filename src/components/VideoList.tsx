@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Edit3, Trash2, Tag, Calendar, Copy } from 'lucide-react';
 import { Video } from '../types/video';
@@ -9,9 +8,10 @@ interface VideoListProps {
   videos: Video[];
   onEdit: (video: Video) => void;
   onDelete: (id: string) => void;
+  selectedWeek: string;
 }
 
-const VideoList: React.FC<VideoListProps> = ({ videos, onEdit, onDelete }) => {
+const VideoList: React.FC<VideoListProps> = ({ videos, onEdit, onDelete, selectedWeek }) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -19,6 +19,21 @@ const VideoList: React.FC<VideoListProps> = ({ videos, onEdit, onDelete }) => {
       month: 'short',
       day: 'numeric',
     });
+  };
+
+  const getWeekRange = (weekStart: string) => {
+    const startDate = new Date(weekStart);
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 6);
+    
+    return `${startDate.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric' 
+    })} - ${endDate.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      year: 'numeric'
+    })}`;
   };
 
   const handleDelete = (id: string, title: string) => {
