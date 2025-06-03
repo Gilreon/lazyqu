@@ -21,6 +21,7 @@ const VideoForm: React.FC<VideoFormProps> = ({
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [currentTag, setCurrentTag] = useState('');
+  const [uploadDay, setUploadDay] = useState('Monday');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -29,6 +30,7 @@ const VideoForm: React.FC<VideoFormProps> = ({
       setDescription(editingVideo.description);
       setTags(editingVideo.tags);
       setCurrentTag('');
+      setUploadDay(editingVideo.uploadDay || 'Monday');
       onSelectedWeekChange(editingVideo.weekStart);
     } else {
       resetForm();
@@ -40,6 +42,7 @@ const VideoForm: React.FC<VideoFormProps> = ({
     setDescription('');
     setTags([]);
     setCurrentTag('');
+    setUploadDay('Monday');
     setErrors({});
   };
 
@@ -85,6 +88,10 @@ const VideoForm: React.FC<VideoFormProps> = ({
       newErrors.weekStart = 'Please select a week';
     }
 
+    if (!uploadDay) {
+      newErrors.uploadDay = 'Please select an upload day';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -101,6 +108,7 @@ const VideoForm: React.FC<VideoFormProps> = ({
       description: description.trim(),
       tags: tags,
       weekStart: selectedWeek,
+      uploadDay: uploadDay,
       createdAt: new Date().toISOString(),
     };
 
@@ -250,6 +258,34 @@ const VideoForm: React.FC<VideoFormProps> = ({
             <p className="text-sm text-red-600">{errors.tags}</p>
           )}
         </div>
+      </div>
+
+      {/* Upload Day Selector */}
+      <div>
+        <label htmlFor="uploadDay" className="block text-sm font-medium text-gray-700 mb-2">
+          Upload Day *
+        </label>
+        <select
+          id="uploadDay"
+          value={uploadDay}
+          onChange={(e) => setUploadDay(e.target.value)}
+          className={`w-full px-4 py-3 border rounded-xl transition-colors ${
+            errors.uploadDay 
+              ? 'border-red-300 focus:border-red-500 focus:ring-red-200' 
+              : 'border-gray-200 focus:border-purple-500 focus:ring-purple-200'
+          } focus:outline-none focus:ring-2`}
+        >
+          <option value="Monday">Monday</option>
+          <option value="Tuesday">Tuesday</option>
+          <option value="Wednesday">Wednesday</option>
+          <option value="Thursday">Thursday</option>
+          <option value="Friday">Friday</option>
+          <option value="Saturday">Saturday</option>
+          <option value="Sunday">Sunday</option>
+        </select>
+        {errors.uploadDay && (
+          <p className="mt-1 text-sm text-red-600">{errors.uploadDay}</p>
+        )}
       </div>
 
       {/* Action Buttons */}
