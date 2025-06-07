@@ -3,6 +3,17 @@ import { Edit3, Trash2, Tag, Calendar, Copy } from 'lucide-react';
 import { Video } from '../types/video';
 import { Button } from './ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface VideoListProps {
   videos: Video[];
@@ -55,6 +66,16 @@ const VideoList: React.FC<VideoListProps> = ({ videos, onEdit, onDelete, selecte
     copyToClipboard(tagsText, 'Tags');
   };
 
+  if (!selectedWeek) {
+    return (
+      <div className="text-center py-12">
+        <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+        <h3 className="text-lg font-medium text-gray-900 mb-2">Select a Week</h3>
+        <p className="text-gray-500">Choose a week to view or plan your videos</p>
+      </div>
+    );
+  }
+
   if (videos.length === 0) {
     return (
       <div className="text-center py-12">
@@ -104,13 +125,28 @@ const VideoList: React.FC<VideoListProps> = ({ videos, onEdit, onDelete, selecte
                 >
                   <Edit3 className="h-4 w-4" />
                 </button>
-                <button
-                  onClick={() => handleDelete(video.id, video.title)}
-                  className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
-                  title="Delete video"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button
+                      className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                      title="Delete video"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Video</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete "{video.title}"? This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => onDelete(video.id)}>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
 

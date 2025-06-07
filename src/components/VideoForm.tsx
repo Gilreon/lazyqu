@@ -19,8 +19,8 @@ const VideoForm: React.FC<VideoFormProps> = ({
 }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
-  const [currentTag, setCurrentTag] = useState('');
+  const [tags, setTags] = useState('');
+  const [formattedTags, setFormattedTags] = useState<string[]>([]);
   const [uploadDay, setUploadDay] = useState('Monday');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -28,8 +28,8 @@ const VideoForm: React.FC<VideoFormProps> = ({
     if (editingVideo) {
       setTitle(editingVideo.title);
       setDescription(editingVideo.description);
-      setTags(editingVideo.tags);
-      setCurrentTag('');
+      setTags(editingVideo.tags.join(', '));
+      setFormattedTags(editingVideo.tags);
       setUploadDay(editingVideo.uploadDay || 'Monday');
       onSelectedWeekChange(editingVideo.weekStart);
     } else {
@@ -40,24 +40,54 @@ const VideoForm: React.FC<VideoFormProps> = ({
   const resetForm = () => {
     setTitle('');
     setDescription('');
-    setTags([]);
-    setCurrentTag('');
+    setTags('');
+    setFormattedTags([]);
     setUploadDay('Monday');
     setErrors({});
   };
 
-  const handleTagKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (currentTag.trim() && !tags.includes(currentTag.trim())) {
-        setTags([...tags, currentTag.trim()]);
-        setCurrentTag('');
-      }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
     }
+
+    // Format tags by splitting on commas and trimming whitespace
+    const processedTags = tags
+      .split(',')
+      .map((tag: string) => tag.trim())
+      .filter((tag: string) => tag.length > 0);
+
+    const videoData = {
+      title: title.trim(),
+      description: description.trim(),
+      tags: processedTags,
+      weekStart: selectedWeek,
+      uploadDay: uploadDay,
+      createdAt: new Date().toISOString(),
+    };
+
+    if (editingVideo) {
+      onSubmit({ ...videoData, id: editingVideo.id });
+    } else {
+      onSubmit(videoData);
+    }
+    
+    // Reset form after successful submission
+    resetForm();
   };
 
-  const removeTag = (indexToRemove: number) => {
-    setTags(tags.filter((_, index) => index !== indexToRemove));
+  const handleTagsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newTags = e.target.value;
+    setTags(newTags);
+    
+    // Update formatted tags preview
+    const processedTags = newTags
+      .split(',')
+      .map((tag: string) => tag.trim())
+      .filter((tag: string) => tag.length > 0);
+    setFormattedTags(processedTags);
   };
 
   const validateForm = () => {
@@ -79,7 +109,7 @@ const VideoForm: React.FC<VideoFormProps> = ({
       newErrors.description = 'Description must not exceed 5000 characters';
     }
 
-    const totalTagsLength = tags.join('').length + currentTag.length;
+    const totalTagsLength = formattedTags.join('').length;
     if (totalTagsLength > 500) {
       newErrors.tags = 'Total tags content must not exceed 500 characters';
     }
@@ -94,30 +124,6 @@ const VideoForm: React.FC<VideoFormProps> = ({
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-
-    const videoData = {
-      title: title.trim(),
-      description: description.trim(),
-      tags: tags,
-      weekStart: selectedWeek,
-      uploadDay: uploadDay,
-      createdAt: new Date().toISOString(),
-    };
-
-    if (editingVideo) {
-      onSubmit({ ...videoData, id: editingVideo.id });
-    } else {
-      onSubmit(videoData);
-      resetForm();
-    }
   };
 
   const getWeekOptions = () => {
@@ -148,8 +154,6 @@ const VideoForm: React.FC<VideoFormProps> = ({
     
     return options;
   };
-
-  const totalTagsLength = tags.join('').length + currentTag.length;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -215,49 +219,36 @@ const VideoForm: React.FC<VideoFormProps> = ({
           Video Tags
         </label>
         
-        {/* Display existing tags */}
-        {tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-3">
-            {tags.map((tag, index) => (
-              <span
-                key={index}
-                className="inline-flex items-center gap-1 bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm"
-              >
-                {tag}
-                <button
-                  type="button"
-                  onClick={() => removeTag(index)}
-                  className="ml-1 text-purple-600 hover:text-purple-800"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
-
-        <input
-          type="text"
+        <textarea
           id="tags"
-          value={currentTag}
-          onChange={(e) => setCurrentTag(e.target.value)}
-          onKeyPress={handleTagKeyPress}
-          className={`w-full px-4 py-3 border rounded-xl transition-colors ${
+          value={tags}
+          onChange={handleTagsChange}
+          className={`w-full px-4 py-3 border rounded-xl transition-colors resize-none ${
             errors.tags 
               ? 'border-red-300 focus:border-red-500 focus:ring-red-200' 
               : 'border-gray-200 focus:border-purple-500 focus:ring-purple-200'
           } focus:outline-none focus:ring-2`}
-          placeholder="Type a tag and press Enter to add..."
+          placeholder="Enter tags separated by commas..."
+          rows={3}
         />
         
-        <div className="mt-1 flex justify-between items-center">
-          <span className={`text-sm ${totalTagsLength > 450 ? 'text-red-600' : 'text-gray-500'}`}>
-            {totalTagsLength}/500 characters
-          </span>
-          {errors.tags && (
-            <p className="text-sm text-red-600">{errors.tags}</p>
-          )}
-        </div>
+        {/* Display formatted tags preview */}
+        {formattedTags.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {formattedTags.map((tag, index) => (
+              <span
+                key={index}
+                className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-sm"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+        
+        {errors.tags && (
+          <p className="mt-1 text-sm text-red-600">{errors.tags}</p>
+        )}
       </div>
 
       {/* Upload Day Selector */}

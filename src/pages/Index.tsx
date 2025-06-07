@@ -1,13 +1,79 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Video, Edit3, Trash2, Plus } from 'lucide-react';
+import { Calendar, Video, Edit3, Trash2, Plus, Trash } from 'lucide-react';
 import VideoForm from '../components/VideoForm';
 import VideoList from '../components/VideoList';
 import { Video as VideoType } from '../types/video';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
+const CREATOR_TIPS = [
+  "Consistency is key - post regularly to build audience trust",
+  "Engage with your audience in comments to build community",
+  "Use trending sounds and hashtags to increase discoverability",
+  "Keep your intros short and attention-grabbing",
+  "Plan your content ahead to maintain consistency",
+  "Quality over quantity - focus on creating valuable content",
+  "Use captions to make your content accessible to everyone",
+  "Collaborate with other creators to reach new audiences",
+  "Study your analytics to understand what works best",
+  "Stay true to your niche and brand voice",
+  "Create a content calendar to stay organized",
+  "Respond to comments within the first hour for better engagement",
+  "Use trending topics to create relevant content",
+  "Keep your videos concise and to the point",
+  "Use high-quality lighting for better video quality",
+  "Create a unique style that sets you apart",
+  "Use storytelling to make your content more engaging",
+  "Experiment with different video formats",
+  "Share behind-the-scenes content to build connection",
+  "Use music that matches your brand's vibe",
+  "Create content that solves problems for your audience",
+  "Use transitions to keep viewers engaged",
+  "Share your journey to build authenticity",
+  "Use call-to-actions to encourage engagement",
+  "Create content that educates and entertains",
+  "Use trending challenges to increase visibility",
+  "Keep your branding consistent across all videos",
+  "Use text overlays to emphasize key points",
+  "Create content that sparks conversation",
+  "Use trending filters to stay relevant",
+  "Share your expertise in your niche",
+  "Use trending effects to stand out",
+  "Create content that inspires action",
+  "Use trending sounds to increase reach",
+  "Share your unique perspective",
+  "Use trending hashtags strategically",
+  "Create content that builds community",
+  "Use trending topics to stay relevant",
+  "Share your authentic self",
+  "Use trending challenges to engage",
+  "Create content that adds value",
+  "Use trending effects creatively",
+  "Share your knowledge generously",
+  "Use trending sounds effectively",
+  "Create content that resonates",
+  "Use trending hashtags wisely",
+  "Share your passion genuinely",
+  "Use trending topics thoughtfully",
+  "Create content that connects",
+  "Use trending challenges smartly"
+];
 
 const Index = () => {
   const [videos, setVideos] = useState<VideoType[]>([]);
   const [selectedWeek, setSelectedWeek] = useState<string>('');
   const [editingVideo, setEditingVideo] = useState<VideoType | null>(null);
+  const [randomTip, setRandomTip] = useState('');
+  const [isTipVisible, setIsTipVisible] = useState(true);
 
   useEffect(() => {
     // Load videos from localStorage on component mount
@@ -20,7 +86,26 @@ const Index = () => {
     const today = new Date();
     const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
     setSelectedWeek(startOfWeek.toISOString().split('T')[0]);
-  }, []);
+
+    // Set initial random tip
+    setRandomTip(CREATOR_TIPS[Math.floor(Math.random() * CREATOR_TIPS.length)]);
+
+    // Set up tip rotation
+    const tipInterval = setInterval(() => {
+      // Fade out
+      setIsTipVisible(false);
+      
+      // After fade out, change tip and fade in
+      setTimeout(() => {
+        const currentIndex = CREATOR_TIPS.indexOf(randomTip);
+        const nextIndex = (currentIndex + 1) % CREATOR_TIPS.length;
+        setRandomTip(CREATOR_TIPS[nextIndex]);
+        setIsTipVisible(true);
+      }, 500); // Half a second for fade out
+    }, 10000); // 10 seconds between tips
+
+    return () => clearInterval(tipInterval);
+  }, [randomTip]);
 
   useEffect(() => {
     // Save videos to localStorage whenever videos array changes
@@ -46,6 +131,10 @@ const Index = () => {
 
   const deleteVideo = (id: string) => {
     setVideos(videos.filter(video => video.id !== id));
+  };
+
+  const clearWeek = () => {
+    setVideos(videos.filter(video => video.weekStart !== selectedWeek));
   };
 
   const filteredVideos = videos.filter(video => video.weekStart === selectedWeek);
@@ -75,9 +164,33 @@ const Index = () => {
           {/* Week Selector */}
           <div className="lg:col-span-3">
             <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <Calendar className="h-5 w-5 text-purple-600" />
-                <h2 className="text-xl font-semibold text-gray-800">Select Upload Week</h2>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-5 w-5 text-purple-600" />
+                  <h2 className="text-xl font-semibold text-gray-800">Select Upload Week</h2>
+                </div>
+                {selectedWeek && filteredVideos.length > 0 && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <button className="flex items-center gap-2 px-4 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors">
+                        <Trash className="h-4 w-4" />
+                        <span>Clear Week</span>
+                      </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Clear Week</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete all videos for this week? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={clearWeek}>Delete All</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
               </div>
               <select
                 value={selectedWeek}
@@ -148,6 +261,20 @@ const Index = () => {
                 onDelete={deleteVideo}
                 selectedWeek={selectedWeek}
               />
+            </div>
+
+            {/* Creator Tip Section */}
+            <div className="mt-6 bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl shadow-lg border border-purple-100 p-6">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">💡</span>
+                <p 
+                  className={`text-gray-700 italic transition-opacity duration-500 ${
+                    isTipVisible ? 'opacity-100' : 'opacity-0'
+                  }`}
+                >
+                  {randomTip}
+                </p>
+              </div>
             </div>
           </div>
         </div>
