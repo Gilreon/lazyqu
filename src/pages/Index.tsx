@@ -156,7 +156,7 @@ const Index = () => {
             </div>
             <div className="ml-auto flex items-center gap-4">
               <div className="text-right">
-                <p className="text-sm text-gray-600">LazyQu is a personal project by Gilreon Lee. All payments are made securely to Gilreon Lee.</p>
+             
                 <a
                   href="https://buymeacoffee.com/gilreon880c"
                   target="_blank"
