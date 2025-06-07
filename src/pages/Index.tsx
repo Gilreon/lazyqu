@@ -154,6 +154,22 @@ const Index = () => {
               </h1>
               <p className="text-gray-600 text-sm">Plan your weekly video uploads</p>
             </div>
+            <div className="ml-auto flex items-center gap-4">
+              <div className="text-right">
+                <p className="text-sm text-gray-600">LazyQu is a personal project by Gilreon Lee. All payments are made securely to Gilreon Lee.</p>
+                <a
+                  href="https://buymeacoffee.com/gilreon880c"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 mt-2 px-4 py-2 bg-[#FFDD00] hover:bg-[#FFDD00]/90 text-black rounded-lg transition-colors"
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20.5 9.5c.83 0 1.5.67 1.5 1.5v1c0 .83-.67 1.5-1.5 1.5H19v6h-2v-6h-3v6h-2v-6H8v6H6v-6H4.5c-.83 0-1.5-.67-1.5-1.5v-1c0-.83.67-1.5 1.5-1.5H6V7c0-2.76 2.24-5 5-5s5 2.24 5 5v2.5h4.5zM8 9.5V7c0-1.66 1.34-3 3-3s3 1.34 3 3v2.5H8z"/>
+                  </svg>
+                  Buy me a coffee
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </header>

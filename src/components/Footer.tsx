@@ -8,14 +8,9 @@ const Footer: React.FC = () => {
           <p>© 2025 Lazyqu. All rights reserved.</p>
           <p className="mt-1">
             Website design and content created by{' '}
-            <a
-              href="https://github.com/Gilreon"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-purple-600 hover:text-purple-700 transition-colors"
-            >
+            
               Gilreon Lee
-            </a>
+            
           </p>
         </div>
       </div>
