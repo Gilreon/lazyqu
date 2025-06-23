@@ -6,12 +6,7 @@ const Footer: React.FC = () => {
       <div className="max-w-6xl mx-auto px-4 py-6">
         <div className="text-center text-gray-600 text-sm">
           <p>© 2025 Lazyqu. All rights reserved.</p>
-          <p className="mt-1">
-            Website design and content created by{' '}
-            
-              Gilreon Lee
-            
-          </p>
+          
         </div>
       </div>
     </footer>
