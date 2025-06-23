@@ -158,7 +158,7 @@ const Index = () => {
               <div className="text-right">
              
                 <a
-                  href="https://buymeacoffee.com/gilreon880c"
+                  href="https://buymeacoffee.com/gil880c"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 mt-2 px-4 py-2 bg-[#FFDD00] hover:bg-[#FFDD00]/90 text-black rounded-lg transition-colors"
